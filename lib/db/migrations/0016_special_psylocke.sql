@@ -1,0 +1,1 @@
+ALTER TABLE "Bkash" ALTER COLUMN "user_mobile_number" SET DATA TYPE varchar(15);

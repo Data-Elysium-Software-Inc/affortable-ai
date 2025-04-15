@@ -1,0 +1,1 @@
+ALTER TABLE "Bkash" ADD COLUMN "payment_id" varchar(255) DEFAULT '' NOT NULL;

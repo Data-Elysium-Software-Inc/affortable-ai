@@ -1,0 +1,1 @@
+ALTER TABLE "User" ALTER COLUMN "api_balance_cents" SET DEFAULT '10.0';

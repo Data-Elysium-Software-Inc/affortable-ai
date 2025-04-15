@@ -1,0 +1,1 @@
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "api_balance_cents" integer DEFAULT 100 NOT NULL;

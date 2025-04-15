@@ -1,0 +1,1 @@
+ALTER TABLE "BkashAuthToken" ALTER COLUMN "token" SET DATA TYPE varchar(1024);

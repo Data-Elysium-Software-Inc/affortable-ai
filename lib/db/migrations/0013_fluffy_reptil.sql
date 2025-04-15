@@ -1,0 +1,1 @@
+ALTER TABLE "User" ADD COLUMN "last_ip_address" varchar(256);

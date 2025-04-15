@@ -1,0 +1,1 @@
+ALTER TABLE "referral" RENAME TO "Referral";

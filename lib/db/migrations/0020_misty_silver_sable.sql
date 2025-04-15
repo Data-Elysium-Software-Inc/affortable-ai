@@ -1,0 +1,1 @@
+ALTER TABLE "Bkash" DROP COLUMN IF EXISTS "auth_token";
