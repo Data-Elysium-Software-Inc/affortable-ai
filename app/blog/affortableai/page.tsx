@@ -8,6 +8,8 @@ export default function AffortableBlog() {
       subtitle="Unlock the power of AI with Affortable AI&apos;s free chatbot. Enhance customer engagement, automate tasks, and drive growth with cutting-edge AI technology. Try it today!"
       image="/images/blog/ai-chatbot-image.png"
       content={
+
+        
         <div className="text-justify space-y-6">
           <h2 className="text-2xl font-bold">Introduction: Why Your Business Needs a Free AI Chatbot from Affortable AI</h2>
           <p>

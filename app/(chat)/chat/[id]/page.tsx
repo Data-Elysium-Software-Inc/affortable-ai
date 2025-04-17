@@ -8,6 +8,8 @@ import { getChatById, getMessagesByChatId, getModelForChat } from "@/lib/db/quer
 import { convertToUIMessages } from "@/lib/utils";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 
+
+
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const { id } = params;
