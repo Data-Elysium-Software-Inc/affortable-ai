@@ -142,6 +142,8 @@ Once the server starts, your app will be accessible at [http://localhost:3000](h
 
 # How to Contribute to Affordable AI
 
+**📺 To get started quickly, check out this video:**  [How to Contribute to Affordable AI](https://www.youtube.com/watch?v=j-1aF3Vvpys)
+
 Follow these steps to contribute to the project:
 
 1. **Visit the Repository**  
