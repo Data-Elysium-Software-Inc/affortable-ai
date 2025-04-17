@@ -3,6 +3,9 @@ import {
   wrapLanguageModel,
   extractReasoningMiddleware,
 } from "ai";
+
+
+
 import { createAzure } from "@ai-sdk/azure";
 import { customMiddleware } from "./custom-middleware";
 import { google } from "@ai-sdk/google";
@@ -76,6 +79,8 @@ export const customModel = (apiIdentifier: string, provider?: string) => {
       middleware: customMiddleware,
     });
   }
+
+  console.log("hello world")
 
   if (provider === "azure") {
     console.log("Using Azure provider ");
