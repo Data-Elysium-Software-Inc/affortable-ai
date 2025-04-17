@@ -193,3 +193,219 @@ Fill in the pull request form with a clear commit title and detailed description
 11. **Await Review**
 Your pull request has been submitted. Now, wait for the Affordable AI team to review and merge your changes.
 ![Figure 9](readme%20figures/fig9.png)
+
+
+
+
+
+# Affordable AI Documentation
+
+## Overview
+This repository contains a **Vercel AI SDK**–based chatbot application, designed to integrate multiple AI model providers seamlessly. It features:
+
+- **Frontend**: Next.js (React) with [shadcn/ui]
+- **Backend**: Next.js App Router (TypeScript)
+- **Database**: PostgreSQL (via [Neon DB])
+- **Deployment**: Vercel
+- **AI Providers**: OpenAI, Anthropic, Google Vertex AI, DeepSeek, and more
+
+## Tech Stack
+- **Next.js** (App Router + React)
+- **TypeScript** for type safety
+- **Shadcn/ui** for ready-to-use React components
+- **Drizzle ORM** (if used) or direct queries
+- **PostgreSQL** hosted on Neon DB
+- **Vercel** for seamless CI/CD and hosting
+
+## File Structure
+Below is the high-level structure with the most critical modules highlighted:
+
+```
+📦 app
+ ┣ 📂 **(auth)**            # Authentication frontend & backend
+ ┣ 📂 **(chat)**            # Chat UI & API logic
+ ┃ ┗ 📂 api
+ ┃   ┗ 📂 chat
+ ┃     ┗ 📄 **route.ts**     # Entry point for all chatbot & AI model endpoints
+ ┣ 📄 layout.tsx           # Frontend root ("use client" written here)
+
+📦 components             # Shared UI components (client-side)
+ ┣ 📄 **multimodal-input.tsx**  # Chat input handlers
+ ┗ 📄 **message.tsx**           # Chat message UI
+
+📦 lib
+ ┣ 📂 ai
+ ┃ ┣ 📄 **models.ts**      # Configuration for AI providers & model metadata
+ ┃ ┗ 📄 **prompts.ts**     # Custom prompt templates per provider
+ ┣ 📂 db
+ ┃ ┣ 📄 **queries.ts**     # All database queries used by API
+ ┃ ┗ 📄 **schema.ts**      # Database schema definitions / migrations
+ ┣ 📄 index.ts             # Optional entrypoint for shared utilities
+ ┗ 📄 custom-middleware.ts # (Optional) request logging, auth checks, etc.
+
+📄 .env                    # Environment variables (DB URL, API keys, etc.)
+```
+
+> **Note**: Files/folders in **bold** are key to the chatbot’s core functionality.
+
+ ![Figure 9](readme%20figures/file-structure.png)
+ 
+ *This figure illustrates the file structures*
+
+---
+
+## Core Modules & Responsibilities
+
+### `app/layout.tsx`
+- The **frontend entry point** for all pages
+- Includes a top-level `<Providers>` wrapper (e.g., for auth, theme)
+- Marked with `"use client"` to enable client-side interactivity
+
+### `app/(auth)`
+- Contains both **frontend** (login/register forms) and **backend** (API routes) for authentication
+- Integrates with NextAuth or custom JWT logic
+
+### `app/(chat)/api/chat/route.ts`
+- Implements the **API route** that handles all chat requests
+- Routes incoming messages to the appropriate AI provider (OpenAI, Anthropic, etc.) based on request payload
+- Uses `lib/ai/models.ts` and `lib/ai/prompts.ts` for provider-specific logic
+- Reads/writes chat history or usage records via `lib/db/queries.ts`
+
+### `components/multimodal-input.tsx`
+- Renders the chat input box, file uploads (images, PDFs), and handles user events
+- Sends typed or multimodal payloads to `/api/chat`
+
+### `components/message.tsx`
+- Renders each chat message with provider-specific styling or attachments
+- Supports text, images, and rich responses
+
+### `lib/ai/models.ts`
+- Exports a list of supported AI providers and their model endpoints
+
+
+### `lib/ai/prompts.ts`
+- Centralizes prompt templates, system messages, and any preprocessing logic
+- Enables easy A/B testing and prompt tweaking per provider
+
+### `lib/db/queries.ts`
+- Houses all SQL queries (via Drizzle ORM or raw SQL) for:
+  - User profiles & sessions
+  - Chat history & logs
+  - Billing / usage tracking
+
+### `lib/db/schema.ts`
+- Defines database tables and migrations
+- Ensures consistent structure across development & production
+
+### `.env`
+Contains sensitive configuration:
+```
+DATABASE_URL=postgresql://<user>:<pass>@<host>:<port>/<db>
+OPENAI_API_KEY=...
+ANTHROPIC_API_KEY=...
+GOOGLE_API_KEY=...
+DEEPSEEK_API_KEY=...
+...
+```
+---
+
+## End‑to‑End Chat Flow
+
+1. **User → Browser**  
+   The user opens the chat UI in their browser and types a message.
+
+2. **Browser → Backend**  
+   The frontend (in `app/(chat)/api/chat/route.ts`) receives the user’s message via a `POST /api/chat` request, including the chosen model and user ID.
+
+3. **Backend → AI Provider**  
+   The backend selects the appropriate AI provider (e.g. GPT‑4, Gemini‑2.5) using `lib/ai/models.ts` and `lib/ai/prompts.ts`, then forwards the user message to that provider’s API.
+
+4. **AI Provider → Backend**  
+   The AI model processes the prompt and returns a generated reply to your backend.
+
+5. **Cost Calculation & Balance Update**  
+   Your backend computes the token-usage cost for the API call, deducts it from the user’s balance, and persists both the chat message and the updated balance via `lib/db/queries.ts`.
+
+6. **Backend → Browser**  
+   Finally, the backend responds to the frontend with the AI’s reply and the user’s new balance.
+
+7. **Browser → User**  
+   The chat UI renders the AI response and displays the updated balance to the user.
+
+ ![Figure 9](readme%20figures/basic_call.png)
+*This figure illustrates the basic call*
+
+---
+
+## Tool‑Call Chat Flow (with Zod Schema & Third‑Party API)
+
+1. **User → Browser**  
+   The user opens the chat UI and types a message.
+
+2. **Browser → Backend**  
+   The frontend sends a `POST /api/chat` to `app/(chat)/api/chat/route.ts` with `{ model: 'tool', message, userId }`.
+
+3. **Prompt Preprocessing & Schema Attachment**  
+   - The backend preprocesses the user’s message into a tool‑specific prompt.  
+   - It attaches a Zod JSON schema describing the expected parameters for that tool call.
+
+4. **Backend → AI Model**  
+   Send the combined `{ prompt, schema }` payload to the AI model (e.g. GPT‑4 or Gemini‑2.5).
+
+5. **AI Model → Backend**  
+   The model parses the schema and returns a JSON object matching the Zod parameter definition.
+
+6. **Execute Tool Function**  
+   - The backend invokes `executeTool(parsedParams)`.  
+   - Inside `executeTool`, a third‑party API is called using those parameters.
+
+7. **Third‑Party API → Backend**  
+   Receive the API’s custom response (data, status, etc.).
+
+8. **Cost Calculation & Persistence**  
+   Compute any usage cost, deduct from the user’s balance, and save both the chat record and updated balance via `lib/db/queries.ts`.
+
+9. **Backend → Browser**  
+   Return the third‑party API’s custom response payload to the frontend.
+
+10. **Browser → User**  
+    The chat UI’s `message.tsx` component renders the custom response for the user to see.
+
+![Figure 9](readme%20figures/tool_call.png)
+*This figure illustrates the tool call*
+
+---
+
+## Authentication & Registration
+
+### Login Options
+- **Google**: Users can log in using their Google account.  
+- **Email/Password**: Users can also log in using a traditional email and password combination.
+
+### Registration Process
+- **Email Registration**:
+  1. Users registering via email must first verify their address by entering a one‑time password (OTP) sent to their email.  
+  2. After successful OTP verification, users proceed to set a new password.  
+  3. A referral code can optionally be provided during registration.  
+- **Google Registration**:
+  - Users registering with Google follow the OAuth flow provided by NextAuth.
+
+### Password Reset
+1. If a user forgets their password, they can initiate a password reset.  
+2. An OTP is sent to the user’s email for verification.  
+3. Once verified, the user is allowed to set a new password.
+
+### Authentication Method
+The system uses a JWT‑based authentication mechanism provided by NextAuth to manage secure user sessions.
+
+**Figure : Basic authentication flow**
+
+![Basic Auth Flow](readme%20figures/basic.png)
+*This figure illustrates the core jwt based login steps*
+
+---
+
+**Figure : Full authentication flow**
+
+![Full Auth Flow](readme%20figures/full.png)
+*This figure illustrates the full login and registration process in affortable-ai*
