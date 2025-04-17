@@ -36,7 +36,7 @@ if (!AZURE_RESOURCE_NAME || !AZURE_API_KEY || !AZURE_DEPLOYMENT_NAME ) {
 //   },
 //   baseURL: "https://swift-ai.p.rapidapi.com",
 // });
-//test
+//test1
 // Create Azure provider instance
 const azure = createAzure({
   resourceName: AZURE_RESOURCE_NAME, // Azure resource name
