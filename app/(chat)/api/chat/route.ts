@@ -275,6 +275,8 @@ export async function POST(request: Request) {
   // // Then recalc chat total cost:
   // await recalcChatTotalCost(id);
 
+  console.log("hello world");
+
   return createDataStreamResponse({
     execute: async (dataStream) => {
       dataStream.writeData({
