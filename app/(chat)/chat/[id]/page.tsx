@@ -53,3 +53,5 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     </>
   );
 }
+
+console.log("chat page loaded", { id });
